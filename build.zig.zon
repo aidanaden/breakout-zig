@@ -40,10 +40,6 @@
             .url = "git+https://github.com/aidanaden/SDL#4fcdb66145a7840f81d1a2acb8c4a81e6e34811a",
             .hash = "SDL-0.0.0-rR2QyFdqAACizEzl96ncXC0i99GpqdbhmvZbecMqSX2I",
         },
-        .zip = .{
-            .url = "git+https://github.com/marler8997/zipcmdline#3dfca786a489d117e4b72ea10ffb4bbd9fc2dd72",
-            .hash = "12201a08d7eff7619c8eb8284691a3ff959861b4bdd87216f180ed136672fb4ea26f",
-        },
     },
     .paths = .{
         "build.zig",
