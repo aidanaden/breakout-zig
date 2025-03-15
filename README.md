@@ -13,5 +13,3 @@ zig 0.14.0
 ```sh
 zig build run
 ```
-
-Preview
