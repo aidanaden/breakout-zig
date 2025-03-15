@@ -36,10 +36,6 @@
     // Once all dependencies are fetched, `zig build` no longer requires
     // internet connectivity.
     .dependencies = .{
-        .sdl = .{
-            .url = "git+https://github.com/castholm/SDL.git#dbb1b96360658f5845ff6fac380c4f13d7276dc2",
-            .hash = "sdl-0.2.0+3.2.8-7uIn9FxHfQE325TK7b0qpgt10G3x1xl-3ZMOfTzxUg3C",
-        },
         .SDL = .{
             .url = "git+https://github.com/aidanaden/SDL#4fcdb66145a7840f81d1a2acb8c4a81e6e34811a",
             .hash = "SDL-0.0.0-rR2QyFdqAACizEzl96ncXC0i99GpqdbhmvZbecMqSX2I",
