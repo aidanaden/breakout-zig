@@ -6,7 +6,8 @@ Based on https://github.com/tsoding/zigout for educational purposes
 
 ## Requirements
 
-zig 0.14.0
+- zig 0.14.0
+- SDL2
 
 ## Build
 
