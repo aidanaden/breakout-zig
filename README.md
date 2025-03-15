@@ -2,7 +2,7 @@
 
 Based on https://github.com/tsoding/zigout for educational purposes
 
-![preview](./preview.mp4)
+![preview](https://vimeo.com/1066209435/21d4979f9f?utm_source=email&utm_medium=vimeo-email&utm_campaign=44349)
 
 ## Requirements
 
