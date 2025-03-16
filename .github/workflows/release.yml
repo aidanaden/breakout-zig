@@ -23,7 +23,7 @@ jobs:
         with:
           version: 0.14.0
       - name: Install x11
-        run: apt-get install libx11-dev
+        run: sudo apt-get install libx11-dev
       # More assembly might be required: Docker logins, GPG, etc.
       # It all depends on your needs.
       - name: Run GoReleaser
