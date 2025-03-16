@@ -15,6 +15,42 @@ const Window = struct {
 };
 
 // --- Game objects ---
+const Projectile = struct {
+    const Size: f32 = 25 * 0.8;
+    const Speed: f32 = 350;
+    const Color: usize = 0xFFFFFFFF;
+    x: f32,
+    y: f32,
+    dx: f32,
+    dy: f32,
+
+    fn init() Projectile {
+        return .{
+            .x = (Window.Width / 2) - (Projectile.Size / 2),
+            .y = Bar.Y - (Bar.Thiccness / 2) - Projectile.Size,
+            .dx = 1,
+            .dy = 1,
+        };
+    }
+};
+
+const Bar = struct {
+    const Length: f32 = 100;
+    const Thiccness: f32 = Projectile.Size;
+    const Y: f32 = Window.Height - Projectile.Size - 50;
+    const Speed: f32 = Projectile.Speed * 1.5;
+    const Color: usize = 0xFF3030FF;
+    x: f32,
+    dx: f32,
+
+    fn init() Bar {
+        return .{
+            .x = (Window.Width / 2) - (Bar.Length / 2),
+            .dx = 0,
+        };
+    }
+};
+
 const Target = struct {
     const Width: f32 = Bar.Length;
     const Height: f32 = Projectile.Size;
@@ -29,26 +65,6 @@ const Target = struct {
     x: f32,
     y: f32,
     dead: bool = false,
-};
-
-const Projectile = struct {
-    const Size: f32 = 25 * 0.8;
-    const Speed: f32 = 350;
-    const Color: usize = 0xFFFFFFFF;
-    x: f32,
-    y: f32,
-    dx: f32,
-    dy: f32,
-};
-
-const Bar = struct {
-    const Length: f32 = 100;
-    const Thiccness: f32 = Projectile.Size;
-    const Y: f32 = Window.Height - Projectile.Size - 50;
-    const Speed: f32 = Projectile.Speed * 1.5;
-    const Color: usize = 0xFF3030FF;
-    x: f32,
-    dx: f32,
 };
 
 const GameStatus = enum {
@@ -75,16 +91,8 @@ fn init_targets() [Target.Rows * Target.Cols]Target {
 const State = struct {
     status: GameStatus = .NotStarted,
     score: u32 = 0,
-    projectile: Projectile = .{
-        .x = (Window.Width / 2) - (Projectile.Size / 2),
-        .y = Bar.Y - (Bar.Thiccness / 2) - Projectile.Size,
-        .dx = 1,
-        .dy = 1,
-    },
-    bar: Bar = .{
-        .x = (Window.Width / 2) - (Bar.Length / 2),
-        .dx = 0,
-    },
+    projectile: Projectile = Projectile.init(),
+    bar: Bar = Bar.init(),
     targets: [Target.Cols * Target.Rows]Target = init_targets(),
 
     const Self = @This();
@@ -288,7 +296,7 @@ fn set_color(renderer: *c.SDL_Renderer, color: u32) void {
     _ = c.SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
 
-/// --- SDL ---
+/// --- SDL handler ---
 pub const SDL = struct {
     window: *c.SDL_Window,
     renderer: *c.SDL_Renderer,
@@ -296,7 +304,7 @@ pub const SDL = struct {
 
     const Self = @This();
     pub fn init() !Self {
-        const window = c.SDL_CreateWindow("breakout-zig", c.SDL_WINDOWPOS_UNDEFINED, c.SDL_WINDOWPOS_UNDEFINED, Window.Width, Window.Height, c.SDL_WINDOW_OPENGL) orelse
+        const window = c.SDL_CreateWindow("breakout!", c.SDL_WINDOWPOS_UNDEFINED, c.SDL_WINDOWPOS_UNDEFINED, Window.Width, Window.Height, c.SDL_WINDOW_OPENGL) orelse
             {
                 c.SDL_Log("Unable to create window: %s", c.SDL_GetError());
                 return error.SDLInitializationFailed;
@@ -330,9 +338,8 @@ pub fn main() !void {
 
     while (state.status != .End) {
         // Handle user input
-        var event: c.SDL_Event = undefined;
-
         // NOTE: this is triggered once per frame
+        var event: c.SDL_Event = undefined;
         while (c.SDL_PollEvent(&event) != 0) {
             switch (event.type) {
                 c.SDL_QUIT => {
@@ -354,7 +361,6 @@ pub fn main() !void {
         }
 
         // Handle movement
-        //
         // NOTE: we track movement via `GetKeyboardState` cuz updating direction
         // via `PollEvent` only occurs once per frame (60x per second when running in 60fps)
         // which results in a less smooth experience.
