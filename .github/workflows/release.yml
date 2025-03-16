@@ -3,6 +3,7 @@ name: goreleaser
 on:
   pull_request:
   push:
+  workflow_dispatch: # Allows manual triggering
 permissions:
   contents: write
   # packages: write
@@ -20,6 +21,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
+      - name: Set up zig
+        uses: mlugg/setup-zig@v1
+        with:
+          version: 0.14.0
       # More assembly might be required: Docker logins, GPG, etc.
       # It all depends on your needs.
       - name: Run GoReleaser
