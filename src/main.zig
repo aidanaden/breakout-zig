@@ -58,11 +58,11 @@ const GameStatus = enum {
     End,
 };
 
-fn init_targets(comptime rows: usize, comptime columns: usize) [rows * columns]Target {
-    comptime var targets: [rows * columns]Target = undefined;
-    inline for (0..rows) |row| {
-        inline for (0..columns) |col| {
-            targets[row * columns + col] = Target{
+fn init_targets() [Target.Rows * Target.Cols]Target {
+    comptime var targets: [Target.Rows * Target.Cols]Target = undefined;
+    inline for (0..Target.Rows) |row| {
+        inline for (0..Target.Cols) |col| {
+            targets[row * Target.Cols + col] = Target{
                 .x = Target.GridX + (@as(f32, col) * (Target.Width + Target.PaddingX)),
                 .y = Target.GridY + @as(f32, row) * Target.PaddingY,
             };
@@ -85,9 +85,16 @@ const State = struct {
         .x = (Window.Width / 2) - (Bar.Length / 2),
         .dx = 0,
     },
-    targets: [Target.Cols * Target.Rows]Target = init_targets(Target.Rows, Target.Cols),
+    targets: [Target.Cols * Target.Rows]Target = init_targets(),
 
     const Self = @This();
+
+    fn revive_targets(self: *Self) void {
+        for (&self.targets) |*target| {
+            target.dead = false;
+        }
+        self.score = 0;
+    }
 
     fn handle_input(self: *Self, keyboard: [*]const u8) void {
         self.bar.dx = 0;
@@ -113,6 +120,10 @@ const State = struct {
     fn update(self: *Self, delta_time: f32) void {
         if (self.status != .Live) {
             return;
+        }
+
+        if (self.score == Target.Rows * Target.Cols) {
+            self.revive_targets();
         }
 
         // If collision between projectile and bar found, update projectile y-coordinate
@@ -154,6 +165,7 @@ const State = struct {
             }
             if (overlaps(&get_target_rect(target.*), &projectile_rect) != 0) {
                 target.dead = true;
+                self.score += 1;
                 self.projectile.dx *= -1;
                 return;
             }
@@ -188,6 +200,7 @@ const State = struct {
             }
             if (overlaps(&get_target_rect(target.*), &projectile_rect) != 0) {
                 target.dead = true;
+                self.score += 1;
                 self.projectile.dy *= -1;
                 return;
             }
