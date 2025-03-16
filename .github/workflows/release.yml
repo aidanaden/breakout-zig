@@ -1,9 +1,6 @@
 # .github/workflows/release.yml
 name: goreleaser
-on:
-  pull_request:
-  push:
-  workflow_dispatch: # Allows manual triggering
+on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: write
   # packages: write
