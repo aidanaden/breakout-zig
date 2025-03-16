@@ -23,7 +23,7 @@ const Target = struct {
     const Rows = 4;
     const Cols = 5;
     const GridWidth = (Target.Cols * Target.Width) + (Target.Cols - 1) * Target.PaddingX;
-    const GridX = Window.Width / 2 - Target.GridWidth / 2;
+    const GridX = (Window.Width / 2) - Target.GridWidth / 2;
     const GridY = 50;
     const Color = 0xFF30FF30;
     x: f32,
@@ -58,6 +58,19 @@ const GameStatus = enum {
     End,
 };
 
+fn init_targets(comptime rows: usize, comptime columns: usize) [rows * columns]Target {
+    comptime var targets: [rows * columns]Target = undefined;
+    inline for (0..rows) |row| {
+        inline for (0..columns) |col| {
+            targets[row * columns + col] = Target{
+                .x = Target.GridX + (@as(f32, col) * (Target.Width + Target.PaddingX)),
+                .y = Target.GridY + @as(f32, row) * Target.PaddingY,
+            };
+        }
+    }
+    return targets;
+}
+
 // --- All mutable state is in a single nested global ---
 const State = struct {
     status: GameStatus = .NotStarted,
@@ -72,7 +85,7 @@ const State = struct {
         .x = (Window.Width / 2) - (Bar.Length / 2),
         .dx = 0,
     },
-    targets: [Target.Cols * Target.Rows]Target = init_targets(Target.Cols, Target.Rows),
+    targets: [Target.Cols * Target.Rows]Target = init_targets(Target.Rows, Target.Cols),
 
     const Self = @This();
 
@@ -217,9 +230,9 @@ const State = struct {
 
         // Render targets
         set_color(renderer, Target.Color);
-        for (&self.targets) |*target| {
+        for (self.targets) |target| {
             if (!target.dead) {
-                const target_rect = get_target_rect(target.*);
+                const target_rect = get_target_rect(target);
                 _ = c.SDL_RenderFillRect(renderer, &target_rect);
             }
         }
@@ -229,19 +242,6 @@ const State = struct {
     }
 };
 var state: State = .{};
-
-fn init_targets(comptime rows: usize, comptime columns: usize) [rows * columns]Target {
-    comptime var targets: [rows * columns]Target = undefined;
-    inline for (0..rows) |row| {
-        inline for (0..columns) |col| {
-            targets[row * columns + col] = Target{
-                .x = Target.GridX + @as(f32, col) * (Target.Width + Target.PaddingX),
-                .y = Target.GridY + @as(f32, row) * (Target.Height + Target.PaddingY),
-            };
-        }
-    }
-    return targets;
-}
 
 ///--- Rendering ---
 fn get_rect(x: f32, y: f32, width: f32, height: f32) c.SDL_Rect {
